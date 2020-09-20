@@ -56,5 +56,8 @@ if __name__=="__main__":
         print("Please provide path to image as a parameter")
         exit(1)
     image_path = sys.argv[1]
-    pipeline = GraphPipeline()
+    
+    tempdir = sys.argv[2] if sys.argv > 2 else "saves"
+    
+    pipeline = GraphPipeline(tempdir)
     pipeline.process(image_path)

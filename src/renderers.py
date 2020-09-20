@@ -5,7 +5,7 @@ from PIL import Image
 import plotly.graph_objects as go
 import json
 import networkx as nx
-
+import igviz as ig
 
 class ImageRenderer:
     def __init__(self, objects=["nodes", "lines"]):
@@ -36,7 +36,6 @@ class PlotlyNodeRenderer:
     def __call__(self, data, image_path, **kwargs):
         predictions = data["nodes"]
         H, W = data['raw_image'].shape[:2]
-        print(H, W)
         bg_image = Image.open(image_path)
         fig = go.Figure()
         fig.add_trace(
@@ -54,7 +53,7 @@ class PlotlyNodeRenderer:
                     y1=w,
                     line=dict(
                         color="RoyalBlue",
-                    ),
+                    )
                 )
         # Add images
         fig.add_layout_image(
@@ -87,10 +86,16 @@ class PlotlyNodeRenderer:
 class NetworkxRenderer:
     def __call__(self, data, image_path, **kwargs):
         graph = data['graph']
-        jsdata = nx.readwrite.json_graph.cytoscape_data(graph)
-        print(jsdata)
+        #jsdata = nx.readwrite.json_graph.cytoscape_data(graph)
+        #print(jsdata)
+        fig = ig.plot(graph,
+            "Electra? Cute!",
+            #color_method="name",
+            node_text=["name"]
+        )
         name = os.path.basename(image_path)
         if name.find(".") >= 0:
             name = os.path.splitext(name)[0]
-        with open(os.path.join("saves", name + "_graph.json"), 'w') as f:
-            json.dump(jsdata, f)
+        fig.write_html(os.path.join("saves", name + "_finished.html"))
+        #with open(os.path.join("saves", name + "_graph.json"), 'w') as f:
+        #    json.dump(jsdata, f)
