@@ -57,7 +57,7 @@ if __name__=="__main__":
         exit(1)
     image_path = sys.argv[1]
     
-    tempdir = sys.argv[2] if sys.argv > 2 else "saves"
+    tempdir = sys.argv[2] if len(sys.argv) > 2 else "saves"
     
     pipeline = GraphPipeline(tempdir)
     pipeline.process(image_path)
