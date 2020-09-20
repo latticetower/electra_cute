@@ -5,15 +5,21 @@ from PIL import Image
 import plotly.graph_objects as go
 
 class ImageRenderer:
-    def __init__(self):
-        pass
+    def __init__(self, objects=["nodes", "lines"]):
+        self.objects = objects
+
     def __call__(self, data, image_path, **kwargs):
         img = data['raw_image'].copy()
-        predictions = data['nodes']
-        #print(predictions)
-        for name, rectangles in predictions.items():
-            for (x0, y0, x1, y1) in rectangles:
-                cv2.rectangle(img, (x0, y0), (x1, y1), (0, 255, 0), 2)
+        if 'nodes' in self.objects:
+            predictions = data['nodes']
+            #print(predictions)
+            for name, rectangles in predictions.items():
+                for (x0, y0, x1, y1) in rectangles:
+                    cv2.rectangle(img, (x0, y0), (x1, y1), (0, 255, 0), 2)
+        if 'lines' in self.objects:
+            lines = data['lines']
+            for x0, y0, x1, y1 in lines:
+                cv2.line(img, (x0, y0), (x1, y1), (255, 0, 0), 4)
         name = os.path.basename(image_path)
         if name.find(".") >= 0:
             name = os.path.splitext(name)[0]

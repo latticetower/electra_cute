@@ -36,11 +36,20 @@ class GMMProcessor:
         return data
 
 
-class CannyProcessor:
-    def __init__(self):
-        pass
+class LineExtractor:
+    def __init__(self, minLineLength=10, maxLineGap=10):
+        self.minLineLength = minLineLength
+        self.maxLineGap = maxLineGap
+        self.minT = 50
+        self.maxT = 150
 
     def __call__(self, data, **kwargs):
-        #print(data)
-        return data
+        img = data['raw_image'].copy()
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #edges = cv2.Canny(gray, 50, 150,apertureSize = 3)
+        edges = ((gray > self.minT) & (gray < self.maxT)).astype(np.uint8)
 
+        lines = cv2.HoughLinesP(edges, 1, np.pi/180, 200,
+            self.minLineLength, self.maxLineGap)
+        data["lines"] = lines[:, 0]
+        return data

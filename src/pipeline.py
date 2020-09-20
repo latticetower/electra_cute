@@ -12,7 +12,7 @@ import sys
 import os
 import cv2
 
-from processors import GMMProcessor, CannyProcessor
+from processors import GMMProcessor, LineExtractor
 from detectors import SimpleTemplateDetector
 from renderers import ImageRenderer, PlotlyNodeRenderer
 
@@ -23,6 +23,7 @@ class GraphPipeline:
         self.tempdir = tempdir
         self.stages = [
             SimpleTemplateDetector(),
+            LineExtractor(),
             #CannyProcessor()
             ImageRenderer(),
             PlotlyNodeRenderer()
