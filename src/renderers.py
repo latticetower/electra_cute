@@ -85,7 +85,7 @@ class PlotlyNodeRenderer:
         
 
 class NetworkxRenderer:
-    def __call__(self, data, **kwargs):
+    def __call__(self, data, image_path, **kwargs):
         graph = data['graph']
         jsdata = nx.readwrite.json_graph.cytoscape_data(graph)
         print(jsdata)

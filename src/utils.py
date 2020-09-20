@@ -1,5 +1,9 @@
 import cv2
 import numpy as np
+from scipy import spatial
+import itertools
+from scipy.spatial.distance import pdist, cdist, squareform
+from sklearn.cluster import dbscan
 
 def unique_transforms(transforms):
     ids = set(np.arange(len(transforms)))
@@ -100,3 +104,44 @@ def get_line_clusters(lines):
     #np.argwhere(labels==-1)
     for x in np.argwhere(labels==-1):
         yield lines[x, :]
+
+
+def convert2centers(preds):
+    XX = preds[:, :2]
+    YY = preds[:, 2:]
+    C = (XX + YY)/2.
+    dif = XX - C
+    
+    return C, np.sqrt(dif[:, 0]**2+dif[:, 1]**2)
+
+
+def get_nodes_connection_matrix(all_clusters, all_points, node_labels, node_rect):
+    
+    # 1. extract points and build KDTree
+    X = all_points[:, :2]
+    Y = all_points[:, 2:]
+    
+    point_ids = np.concatenate([np.arange(len(X))]*2)
+    kdtree = spatial.KDTree(np.concatenate([X, Y]))
+    # 2. get centers and radii for nodes 
+    node_centers, node_radii = convert2centers(node_rect)
+    # 3. query node centers with given radii against points in kdtree.
+    all_connections = dict()
+    for coords, r, node in zip(node_centers, node_radii, np.arange(len(node_labels))):
+        ids = kdtree.query_ball_point(coords, r)
+
+        ids_ = np.unique(point_ids[ids])
+        for cluster in np.unique(all_clusters[ids_]):
+            if not cluster in all_connections:
+                all_connections[cluster] = set()
+            all_connections[cluster].add(node)
+    # 4. convert to connection matrix
+    N = len(node_labels)
+    
+    connection_matrix = np.zeros((N, N))
+    for nodes in all_connections.values():
+        for i, j in itertools.combinations(nodes, 2):
+            connection_matrix[i, j] = 1
+            connection_matrix[j, i] = 1
+    return connection_matrix
+    #END

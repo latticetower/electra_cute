@@ -12,7 +12,7 @@ import sys
 import os
 import cv2
 
-from processors import GMMProcessor, LineExtractor, LineClusterizer
+from processors import GMMProcessor, LineExtractor, LineClusterizer, NodeConnector
 from detectors import SimpleTemplateDetector
 from renderers import ImageRenderer, PlotlyNodeRenderer, NetworkxRenderer
 from graph_tools import *
@@ -29,6 +29,7 @@ class GraphPipeline:
             ImageRenderer(), # for debugging purposes
             PlotlyNodeRenderer(), # also for debugging
             NodeBuilder(),
+            NodeConnector(),
             EdgeBuilder(),
             #CannyProcessor()
             #ImageRenderer(),

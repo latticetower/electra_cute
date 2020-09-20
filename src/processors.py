@@ -2,7 +2,7 @@ from sklearn.mixture import GaussianMixture
 import numpy as np
 import cv2
 
-from utils import get_line_clusters
+from utils import *
 
 class GMMProcessor:
     def __init__(self, nclusters=4):
@@ -58,6 +58,27 @@ class LineExtractor:
 
 class LineClusterizer:
     def __call__(self, data, **kwargs):
-        data['line_clusters'] = get_line_clusters(data['lines'])
+        
+        all_points = []
+        all_clusters = []
+        for i, points in enumerate(get_line_clusters(data['lines'])):
+            all_points.append(points)
+            all_clusters.extend([i]*points.shape[0])
+        data['line_clusters'] = np.asarray(all_clusters)
+        data['line_points'] = np.concatenate(all_points)
+        return data
+
+
+class NodeConnector:
+    def __call__(self, data, **kwargs):
+        line_clusters = data["line_clusters"] #all_clusters
+        line_points = data["line_points"] #all_points
+        
+        node_labels = data["node_labels"] #all_clusters
+        node_rect = data["node_coords"] #all_points
+        connection_matrix = get_nodes_connection_matrix(
+            line_clusters, line_points,
+            node_labels, node_rect)
+        data['connection_matrix'] = connection_matrix
         return data
 
