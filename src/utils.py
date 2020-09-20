@@ -75,3 +75,28 @@ def non_max_suppression_fast(boxes, overlapThresh):
     # integer data type
     return boxes[pick].astype("int")
     
+
+def get_line_clusters(lines):
+    """Takes array with N lines [N, (x0, y0, x1, y1)], and clusters them.
+    We need to connect lines if they have common somewhere and don't connect otherwise.
+    After that we do clustering to get sets of lines.
+    """
+    X = lines[:, :2]
+    Y = lines[:, 2:]
+    threshold = 10
+    a = np.argwhere(cdist(X, Y) < threshold)
+    b = np.argwhere(cdist(Y, X) < threshold)
+    c = np.argwhere(cdist(X, X) < threshold)
+    d = np.argwhere(cdist(Y, Y) < threshold)
+    edges = np.concatenate([a,b, c, d])
+    matrix = np.ones((X.shape[0], X.shape[0]))
+    for k, v in edges:
+        matrix[k, v] = 0
+    core_samples, labels = dbscan(matrix, metric="precomputed", eps=0.5, min_samples=2)
+    clusters = np.unique(labels[core_samples])
+    for cluster in clusters:
+        line_ids = np.argwhere(labels == cluster).flatten()
+        yield lines[line_ids, :]
+    #np.argwhere(labels==-1)
+    for x in np.argwhere(labels==-1):
+        yield lines[x, :]
