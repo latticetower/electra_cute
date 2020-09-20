@@ -12,9 +12,10 @@ import sys
 import os
 import cv2
 
-from processors import GMMProcessor, LineExtractor
+from processors import GMMProcessor, LineExtractor, LineClusterizer
 from detectors import SimpleTemplateDetector
-from renderers import ImageRenderer, PlotlyNodeRenderer
+from renderers import ImageRenderer, PlotlyNodeRenderer, NetworkxRenderer
+from graph_tools import *
 
 class GraphPipeline:
     def __init__(self, tempdir="images"):
@@ -24,9 +25,15 @@ class GraphPipeline:
         self.stages = [
             SimpleTemplateDetector(),
             LineExtractor(),
+            LineClusterizer(),
+            ImageRenderer(), # for debugging purposes
+            PlotlyNodeRenderer(), # also for debugging
+            NodeBuilder(),
+            EdgeBuilder(),
             #CannyProcessor()
-            ImageRenderer(),
-            PlotlyNodeRenderer()
+            #ImageRenderer(),
+            #PlotlyNodeRenderer(),
+            NetworkxRenderer()
         ]
 
     def process(self, image_path, i=0):

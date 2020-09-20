@@ -78,7 +78,7 @@ def non_max_suppression_fast(boxes, overlapThresh):
 
 def get_line_clusters(lines):
     """Takes array with N lines [N, (x0, y0, x1, y1)], and clusters them.
-    We need to connect lines if they have common somewhere and don't connect otherwise.
+    We need to connect lines if they have common points somewhere and we don't connect them otherwise.
     After that we do clustering to get sets of lines.
     """
     X = lines[:, :2]

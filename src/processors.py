@@ -2,6 +2,7 @@ from sklearn.mixture import GaussianMixture
 import numpy as np
 import cv2
 
+from utils import get_line_clusters
 
 class GMMProcessor:
     def __init__(self, nclusters=4):
@@ -53,3 +54,10 @@ class LineExtractor:
             self.minLineLength, self.maxLineGap)
         data["lines"] = lines[:, 0]
         return data
+
+
+class LineClusterizer:
+    def __call__(self, data, **kwargs):
+        data['line_clusters'] = get_line_clusters(data['lines'])
+        return data
+

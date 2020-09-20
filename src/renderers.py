@@ -3,6 +3,9 @@ import cv2
 import os
 from PIL import Image
 import plotly.graph_objects as go
+import json
+import networkx as nx
+
 
 class ImageRenderer:
     def __init__(self, objects=["nodes", "lines"]):
@@ -79,3 +82,15 @@ class PlotlyNodeRenderer:
         if name.find(".") >= 0:
             name = os.path.splitext(name)[0]
         fig.write_html(os.path.join("saves", name + "_nodes_plot.html"))
+        
+
+class NetworkxRenderer:
+    def __call__(self, data, **kwargs):
+        graph = data['graph']
+        jsdata = nx.readwrite.json_graph.cytoscape_data(graph)
+        print(jsdata)
+        name = os.path.basename(image_path)
+        if name.find(".") >= 0:
+            name = os.path.splitext(name)[0]
+        with open(os.path.join("saves", name + "_graph.json"), 'w') as f:
+            json.dump(jsdata, f)
