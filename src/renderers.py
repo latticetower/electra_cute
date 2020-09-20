@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 import os
-
+from PIL import Image
+import plotly.graph_objects as go
 
 class ImageRenderer:
     def __init__(self):
@@ -19,8 +20,56 @@ class ImageRenderer:
         cv2.imwrite(os.path.join("saves", name + "_nodes.png"), img)
 
 
-class PlotlyRenderer:
+class PlotlyNodeRenderer:
     def __init__(self):
         pass
-    def __call__(self, data, **kwargs):
-        pass
+        
+    def __call__(self, data, image_path, **kwargs):
+        predictions = data["nodes"]
+        H, W = data['raw_image'].shape[:2]
+        print(H, W)
+        bg_image = Image.open(image_path)
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(x=[0, 0.5, 1, 2, 2.2], y=[1.23, 2.5, 0.42, 3, 1])
+            )
+
+        for name, coords in predictions.items():
+            for y, x, h, w in coords:
+                fig.add_shape(
+                    # unfilled Rectangle
+                    type="rect",
+                    x0=y,
+                    y0=x,
+                    x1=h,
+                    y1=w,
+                    line=dict(
+                        color="RoyalBlue",
+                    ),
+                )
+        # Add images
+        fig.add_layout_image(
+                dict(
+                    source=bg_image, #image_path,
+                    xref="x",
+                    yref="y",
+                    x=0,
+                    y=0,
+                    sizex=W,
+                    sizey=H,
+                    sizing="stretch",
+                    opacity=0.5,
+                    layer="below")
+        )
+        # Set templates
+        fig.update_layout(
+            width=W,
+            height=H,
+            autosize=True,
+            template="plotly_white")
+            
+        fig.update_yaxes(automargin=True, autorange="reversed")
+        name = os.path.basename(image_path)
+        if name.find(".") >= 0:
+            name = os.path.splitext(name)[0]
+        fig.write_html(os.path.join("saves", name + "_nodes_plot.html"))

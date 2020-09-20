@@ -14,7 +14,7 @@ import cv2
 
 from processors import GMMProcessor, CannyProcessor
 from detectors import SimpleTemplateDetector
-from renderers import ImageRenderer
+from renderers import ImageRenderer, PlotlyNodeRenderer
 
 class GraphPipeline:
     def __init__(self, tempdir="images"):
@@ -24,7 +24,8 @@ class GraphPipeline:
         self.stages = [
             SimpleTemplateDetector(),
             #CannyProcessor()
-            ImageRenderer()
+            ImageRenderer(),
+            PlotlyNodeRenderer()
         ]
 
     def process(self, image_path, i=0):

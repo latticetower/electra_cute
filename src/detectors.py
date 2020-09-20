@@ -26,8 +26,8 @@ class SimpleTemplateDetector:
         predictions = dict()
         for name, template_basic in self.templates:
             template_basic = shrink_template(template_basic)
-            if not np.any(template_basic == 0):
-                continue
+            #if not np.any(template_basic == 0):
+            #    continue
             transforms = [
                 template_basic,
                 #np.fliplr(template_basic),
@@ -57,4 +57,13 @@ class SimpleTemplateDetector:
         }
         data['nodes'] = predictions
         return data
-        
+
+
+
+class ConflictResolver:
+    "resolves conflict between nodes"
+    def __init__(self):
+        pass
+
+    def __call__(self, data, **kwargs):
+        pass
